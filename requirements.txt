@@ -1,0 +1,117 @@
+﻿# ==============================================================================
+# STRAPSim: Portfolio Similarity Metric - Production Dependencies
+# ==============================================================================
+# 
+# Version Strategy: Compatible release (~=) allows patch updates while
+# preventing minor version changes that could introduce breaking changes.
+# This follows PEP-440 and ensures reproducible builds in production.
+#
+# Python Version Requirement: >=3.8,<3.13
+# Last Updated: October 2025
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Core Numerical and Data Manipulation Stack
+# ------------------------------------------------------------------------------
+
+# NumPy: Fundamental array computing and linear algebra operations
+# Version 1.24.x provides stable API for matrix operations required in
+# constituent similarity calculations and the STRAPSim matching algorithm.
+# Pinned to <2.0 to avoid breaking changes in v2.x series.
+numpy>=1.24.0,<2.0.0
+
+# Pandas: High-performance data structures for time-series and tabular data
+# Version 2.0.x introduces copy-on-write semantics and performance improvements
+# critical for handling large ETF holdings and return series datasets.
+pandas>=2.0.0,<2.3.0
+
+# ------------------------------------------------------------------------------
+# Scientific Computing and Statistics
+# ------------------------------------------------------------------------------
+
+# SciPy: Scientific computing library for statistical functions
+# Spearman rank correlation (scipy.stats.spearmanr) requires 1.10.x for
+# consistent p-value calculation and handling of ties in ranking.
+scipy>=1.10.0,<1.15.0
+
+# ------------------------------------------------------------------------------
+# Machine Learning Framework
+# ------------------------------------------------------------------------------
+
+# Scikit-learn: Machine learning library for Random Forest implementation
+# Version 1.3.x provides stable RandomForestRegressor with multi-output support,
+# GridSearchCV for hyperparameter optimization, and consistent proximity matrix
+# extraction via apply() method. Critical for supervised similarity learning.
+scikit-learn>=1.3.0,<1.6.0
+
+# ------------------------------------------------------------------------------
+# Performance Optimization
+# ------------------------------------------------------------------------------
+
+# Numba: JIT compiler for performance-critical numerical code
+# Version 0.58.x provides LLVM-based compilation for the greedy bipartite
+# matching loop in STRAPSim, delivering 10-100x speedup over pure Python.
+# Compatible with NumPy <2.0 constraint.
+numba>=0.58.0,<0.61.0
+
+# ------------------------------------------------------------------------------
+# Data Validation and Schema Enforcement
+# ------------------------------------------------------------------------------
+
+# jsonschema: JSON Schema validation for input data integrity
+# Version 4.19.x implements Draft 2020-12 specification, essential for
+# validating portfolio data structures, ETF holdings, and configuration files
+# in the data ingestion pipeline.
+jsonschema>=4.19.0,<5.0.0
+
+# ------------------------------------------------------------------------------
+# User Experience and Monitoring
+# ------------------------------------------------------------------------------
+
+# tqdm: Progress bar library for long-running operations
+# Version 4.66.x provides clean CLI output for cross-validation loops,
+# pairwise similarity computations, and batch processing of ETF pairs.
+# Minimal dependency footprint.
+tqdm>=4.66.0,<5.0.0
+
+# ==============================================================================
+# Installation Instructions
+# ==============================================================================
+#
+# Standard Installation:
+#   pip install -r requirements.txt
+#
+# Development Installation (with hash verification):
+#   pip install --require-hashes -r requirements.txt
+#
+# Virtual Environment Setup:
+#   python3 -m venv venv
+#   source venv/bin/activate  # On Windows: venv\Scripts\activate
+#   pip install --upgrade pip
+#   pip install -r requirements.txt
+#
+# Verification:
+#   python -c "import numpy, pandas, sklearn, scipy, numba, jsonschema, tqdm; print('All dependencies loaded successfully')"
+#
+# ==============================================================================
+# Dependency Resolution Notes
+# ==============================================================================
+#
+# 1. NumPy Version Constraint:
+#    - NumPy 2.x introduces breaking changes in C API and random number generation
+#    - SciPy, scikit-learn, and Numba require compatibility testing with NumPy 2.x
+#    - Conservative <2.0.0 constraint ensures stability
+#
+# 2. Scikit-learn and NumPy Compatibility:
+#    - sklearn 1.3.x → 1.5.x certified compatible with numpy 1.24.x → 1.26.x
+#    - Proximity matrix extraction relies on internal tree structure
+#
+# 3. Numba and NumPy Compatibility:
+#    - Numba 0.58.x → 0.60.x supports NumPy up to 1.26.x
+#    - JIT compilation requires ABI stability
+#
+# 4. SciPy Statistical Functions:
+#    - spearmanr implementation stable since 1.10.0
+#    - Consistent handling of NaN values and tie-breaking
+#
+# ==============================================================================
