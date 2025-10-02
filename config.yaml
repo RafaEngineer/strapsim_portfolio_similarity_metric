@@ -1,0 +1,189 @@
+﻿# ==============================================================================
+# High-Fidelity Configuration File for Reproducing the STRAPSim Study
+# Source: "STRAPSim: A Portfolio Similarity Metric for ETF Alignment and Portfolio Trades"
+#         Li et al. (2025), arXiv:2509.24151
+# ==============================================================================
+
+# --------------------------------------------------------------------------
+# Section 1: Data and Experiment Setup Parameters
+# Source: Section 3.2 "Corporate Bond ETFs" and Section 4 "Experimental Setup"
+# --------------------------------------------------------------------------
+data_setup:
+  valuation_date: '2024-03-31'
+  return_series_start_date: '2022-02-28'
+  return_series_end_date: '2024-03-31'
+  return_frequency: 'M'
+  total_corporate_bond_etfs: 20
+  total_unique_bonds: 6870
+  average_bonds_per_etf: 511
+  return_type: 'total_return'
+  currency_normalization: 'USD'
+
+# --------------------------------------------------------------------------
+# Section 2: Feature Engineering and Preprocessing Parameters
+# Source: Section 3.2 "Corporate Bond ETFs" and Section 4.1 "Experimental Setup"
+# --------------------------------------------------------------------------
+feature_engineering:
+  categorical_features_to_one_hot_encode:
+    - 'issuer'
+    - 'industry'
+    - 'bond_rating'
+    - 'market'
+    - 'currency'
+    - 'country'
+    - 'flag_144a'
+  
+  numerical_features:
+    - 'days_to_maturity'
+    - 'age'
+    - 'coupon'
+    - 'amount_issued'
+    - 'coupon_frequency'
+  
+  target_variables: ['oas', 'yield']
+  
+  training_set_fraction: 0.90
+  testing_set_fraction: 0.10
+  random_state_for_shuffle: 42
+  shuffle_before_split: true
+  
+  missing_value_handling: 'none_required'
+  validate_no_missing_values: true
+
+# --------------------------------------------------------------------------
+# Section 3: Random Forest Model Configuration
+# Source: Section 3.2 "Corporate Bond ETFs"
+# --------------------------------------------------------------------------
+random_forest_config:
+  model_type: 'RandomForestRegressor'
+  
+  cross_validation_folds: 5
+  cv_scoring_metric: 'neg_root_mean_squared_error'
+  
+  hyperparameters_to_tune:
+    n_estimators: [50, 100, 200, 500]
+    max_depth: [5, 10, 15, 20, null]
+  
+  tuning_method: 'grid_search'
+  tuning_objective: 'minimize_rmse'
+  
+  expected_training_rmse: 0.21
+  expected_training_mape: 0.08
+  expected_testing_rmse: 0.51
+  expected_testing_mape: 0.15
+  
+  random_state: 42
+  n_jobs: -1
+  multi_output_strategy: 'direct'
+
+# --------------------------------------------------------------------------
+# Section 4: STRAPSim Algorithm Configuration
+# Source: Section 2.1 "STRAPSim Methodology" and Equations (1a), (1b)
+# --------------------------------------------------------------------------
+strapsim_algorithm:
+  convergence_threshold: 1.0e-6
+  max_iterations: 10000
+  similarity_threshold: 0.0
+  weight_precision_tolerance: 1.0e-8
+  
+  similarity_function_type: 'random_forest_proximity'
+  proximity_normalization: false
+  
+  residual_tracking: true
+  weight_conservation_validation: true
+  greedy_selection_strategy: 'max_similarity'
+  
+  return_similarity_score: true
+  return_residuals: true
+  return_matching_details: true
+  precision_digits: 6
+
+# --------------------------------------------------------------------------
+# Section 5: Baseline Method Configurations
+# Source: Section 2.2 "Jaccard Index", 2.3 "Weighted Jaccard", 2.4 "BERTScore"
+# --------------------------------------------------------------------------
+baseline_methods:
+  jaccard_config:
+    exact_match_required: true
+    identifier_field: 'cusip'
+    case_sensitive_matching: true
+    compute_residual: true
+  
+  weighted_jaccard_config:
+    weight_field: 'weight'
+    min_weight_intersection: true
+    max_weight_union: true
+    weight_normalization_check: true
+    exact_match_required: true
+    compute_residual: true
+  
+  bertscore_config:
+    compute_recall: true
+    compute_precision: true
+    compute_f1: true
+    similarity_function: 'random_forest_proximity'
+    weight_scheme: 'min_weight'
+    bidirectional_matching: true
+    compute_residuals: true
+    residual_aggregation: 'harmonic_mean'
+
+# --------------------------------------------------------------------------
+# Section 6: Evaluation and Statistical Analysis Parameters
+# Source: Section 4.3 "Performance Evaluation" and Table 4
+# --------------------------------------------------------------------------
+evaluation_config:
+  ground_truth_metric: 'pearson_correlation'
+  return_correlation_method: 'pearson'
+  
+  primary_evaluation_metric: 'spearman_rank_correlation'
+  correlation_test_type: 'two_tailed'
+  
+  significance_levels: [0.05, 0.10]
+  multiple_testing_correction: null
+  
+  compute_average_correlation: true
+  compute_average_pvalue: true
+  compute_significance_percentage: true
+  exclude_self_comparison: true
+  
+  ranking_method: 'descending'
+  handle_ranking_ties: 'average'
+  minimum_etf_pairs_for_analysis: 10
+
+# --------------------------------------------------------------------------
+# Section 7: Expected Results Validation
+# Source: Table 4 "Statistics of Spearman's Rank Correlation"
+# --------------------------------------------------------------------------
+expected_results:
+  strapsim_expected_correlation: 0.6783
+  strapsim_expected_pvalue: 0.0081
+  strapsim_expected_significance_5pct: 95
+  strapsim_expected_significance_10pct: 100
+  
+  jaccard_expected_correlation: 0.5864
+  weighted_jaccard_expected_correlation: 0.5791
+  bertscore_expected_correlation: 0.5865
+  
+  correlation_tolerance: 0.05
+  pvalue_tolerance: 0.01
+  significance_percentage_tolerance: 5
+
+# --------------------------------------------------------------------------
+# Section 8: Computational Configuration
+# Source: Implementation requirements for large-scale financial data processing
+# --------------------------------------------------------------------------
+computational_config:
+  n_jobs: -1
+  parallel_backend: 'threading'
+  
+  float_precision: 'float64'
+  similarity_score_precision: 6
+  weight_precision: 8
+  correlation_precision: 4
+  
+  global_random_seed: 42
+  ensure_reproducible_results: true
+  
+  cache_similarity_matrices: true
+  garbage_collection_enabled: true
+  efficient_data_types: true
