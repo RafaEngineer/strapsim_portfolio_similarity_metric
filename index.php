@@ -14,7 +14,7 @@
         <button type="submit">Cadastrar</button>
     </form>
     <?php
-     require('../Udemy/Database.php');
+     require('../PDWEL-master/Database.php');
      $nome = filter_input(INPUT_POST, 'nome', FILTER_SANITIZE_STRING);
      $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
      $descricao = filter_input(INPUT_POST, 'descricao', FILTER_SANITIZE_SPECIAL_CHARS);

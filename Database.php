@@ -11,7 +11,7 @@ class database{
 		//$password = '';
 		try{
 			//$this->PDO = NEW PDO($dsn, $user, $password);
-			$this->PDO = new PDO("mysql:host=localhost;dbname={$dbname}",'root','aluno123');
+			$this->PDO = new PDO("mysql:host=127.0.0.1;dbname={$dbname}",'root','');
 			//$this ->PDO->setAttribute( attribute PDO::ATTR_ERRMODE, value: PDO::ERRMODE_EXCEPTION);
 		}catch (PDOException $e){
 			die("Ops, houve um erro: <b> {$e ->	getMessage()} </b>");
@@ -32,13 +32,29 @@ class database{
 	return false;
 }
 
-
 	public function select($sql, array $binds){
-		$stmt = $this->PDO->prepare($sql, $binds);
+		$stmt = $this->PDO->prepare($sql);
 		foreach($binds as $key => $value){
 			$stmt->bindValue($key, $value);
 		}
 		$stmt->execute();
 		return $stmt;
+	}
+
+	public function update($sql, array $binds){
+		$stmt = $this->PDO->prepare($sql);
+		foreach($binds as $key =>$value){
+			$stmt->bindValue($key, $value);
+		}
+		$stmt->execute();
+		return $stmt->rowCount();
+	}
+	public function delete($sql, array $binds){
+		$stmt = $this->PDO->prepare($sql);
+		foreach($binds as $key=> $value){
+			$stmt->bindValue($key, $value);
+		}	
+	$stmt->execute();
+	return $stmt->rowCount();
 	}
 }

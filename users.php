@@ -8,17 +8,18 @@
 <div class="crud">
    <h3>Lista de Usuário</h3>
     <?php
-    require('../Udemy/Database.php');
+    require('../PDWEL-master/Database.php');
     $DataBase = new Database();
     $sql = "SELECT * FROM usuarios WHERE id > :id";
     $binds = ['id' =>2];
-    $dados = $DataBase->SELECT($sql, $binds);
-    if($dados ->rowCount() >0){
+    $result = $DataBase->SELECT($sql, $binds);
+    if($result ->rowCount() >0){
+        $dados = $result ->fetchAll(PDO::FETCH_OBJ);
         foreach ($dados as $item){
-            echo "div class='result'>";
-            echo "Nome : {$item['nome']} <br>";
-            echo "Email : {$item['email']} <br>";
-            echo "descrição : {$item['descricao']} <br>";
+            echo "<div class='result'>";
+            echo "Nome : {$item->nome} <br>";
+            echo "Email : {$item->email} <br>";
+            echo "descrição : {$item->descricao} <br>";
             echo "</div>";
         }
     }
